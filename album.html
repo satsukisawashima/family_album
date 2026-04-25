@@ -3,34 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>アルバム - パピーアルバム</title>
+  <title>アルバム</title>
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="wrap header-inner">
-      <div>
-        <p class="eyebrow">パピーアルバム</p>
-        <h1>写真を投稿すると、犬の気持ちが自動で生まれる</h1>
-      </div>
-      <nav aria-label="ページナビゲーション">
-        <ul class="site-nav">
-          <li><a href="index.html">ホーム</a></li>
-          <li><a href="album.html" aria-current="page">アルバム</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
-
   <main>
-    <section class="wrap album-hero">
-      <div class="hero-copy">
-        <p class="eyebrow">写真投稿を日記体験に</p>
-        <h2>写真をアップするだけで、愛犬の気持ちとストーリーが自動生成されます</h2>
-        <p>複数枚投稿にも対応し、投稿はタイムラインで最新順に表示されます。写真は横に最大3枚並び、あとは縦に続く「みてね」風のレイアウトです。</p>
-      </div>
-    </section>
-
     <section class="wrap post-section">
       <form id="postForm" class="post-form">
         <fieldset>
@@ -65,36 +42,10 @@
       </div>
     </section>
 
-    <section class="wrap album-list" aria-labelledby="album-title">
-      <div class="section-head">
-        <div>
-          <h2 id="album-title">投稿タイムライン</h2>
-          <p>写真は最新順に並びます。横に最大3枚表示され、以降は縦に並ぶレイアウトです。</p>
-        </div>
-      </div>
+    <section class="wrap album-list">
       <div id="postList" class="post-list"></div>
     </section>
   </main>
-
-  <div id="editModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
-    <div class="modal-content">
-      <h3 id="editModalTitle">コメントを編集</h3>
-      <form id="editForm">
-        <label for="editCaption">コメント</label>
-        <textarea id="editCaption" rows="4"></textarea>
-        <div class="modal-actions">
-          <button type="button" id="cancelEdit">キャンセル</button>
-          <button type="submit">保存する</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <footer class="site-footer">
-    <div class="wrap">
-      <p>HTML/CSS/JavaScriptのみの静的サイトです。GitHub PagesやLive Serverでそのまま確認できます。</p>
-    </div>
-  </footer>
 
   <script src="assets/js/app.js"></script>
 </body>

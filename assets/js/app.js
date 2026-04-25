@@ -9,11 +9,6 @@ const previewMood = document.getElementById('previewMood');
 const previewStory = document.getElementById('previewStory');
 const postList = document.getElementById('postList');
 const postForm = document.getElementById('postForm');
-const editModal = document.getElementById('editModal');
-const editForm = document.getElementById('editForm');
-const editCaption = document.getElementById('editCaption');
-const cancelEdit = document.getElementById('cancelEdit');
-let editingPostId = null;
 
 const moodCategories = {
   happy: 'うれしいな',
@@ -217,10 +212,6 @@ function renderPosts() {
         </header>
         ${post.caption ? `<p class="post-user-comment"><strong>メモ：</strong>${escapeHtml(post.caption)}</p>` : ''}
         <p class="post-story">${escapeHtml(post.story)}</p>
-        <div class="post-actions">
-          <button type="button" class="edit-btn" data-id="${post.id}">編集</button>
-          <button type="button" class="delete-btn" data-id="${post.id}">削除</button>
-        </div>
       </div>
     `;
     postList.appendChild(article);
@@ -272,92 +263,6 @@ postForm.addEventListener('submit', async (event) => {
     alert('投稿に失敗しました。もう一度お試しください。');
   }
 });
-
-postList.addEventListener('click', (event) => {
-  const button = event.target.closest('button');
-  if (!button) {
-    return;
-  }
-
-  const postId = button.dataset.id;
-  if (!postId) {
-    return;
-  }
-
-  if (button.classList.contains('edit-btn')) {
-    editPost(postId);
-  }
-
-  if (button.classList.contains('delete-btn')) {
-    deletePost(postId);
-  }
-});
-
-function editPost(id) {
-  const posts = loadPosts();
-  const post = posts.find((item) => String(item.id) === String(id));
-  if (!post) {
-    return;
-  }
-
-  editingPostId = id;
-  editCaption.value = post.caption || post.story;
-  editModal.classList.remove('hidden');
-}
-
-function deletePost(id) {
-  if (!confirm('この投稿を削除しますか？')) {
-    return;
-  }
-
-  const posts = loadPosts();
-  const nextPosts = posts.filter((item) => String(item.id) !== String(id));
-  savePosts(nextPosts);
-  renderPosts();
-}
-
-editForm.addEventListener('submit', (event) => {
-  event.preventDefault();
-  if (!editingPostId) {
-    return;
-  }
-
-  const newCaption = editCaption.value.trim();
-  const posts = loadPosts();
-  const index = posts.findIndex((item) => String(item.id) === String(editingPostId));
-  if (index === -1) {
-    return;
-  }
-
-  const category = getMoodCategory(newCaption);
-  posts[index].caption = newCaption;
-  posts[index].mood = getMood(category);
-  posts[index].story = generateStory(newCaption, category);
-  savePosts(posts);
-  closeModal();
-  renderPosts();
-});
-
-cancelEdit.addEventListener('click', () => {
-  closeModal();
-});
-
-editModal.addEventListener('click', (event) => {
-  if (event.target === editModal) {
-    closeModal();
-  }
-});
-
-window.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && !editModal.classList.contains('hidden')) {
-    closeModal();
-  }
-});
-
-function closeModal() {
-  editingPostId = null;
-  editModal.classList.add('hidden');
-}
 
 window.addEventListener('DOMContentLoaded', () => {
   renderPosts();
