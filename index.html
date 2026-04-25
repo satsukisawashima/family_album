@@ -7,47 +7,47 @@
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="wrap header-inner">
-      <div>
-        <p class="eyebrow">ファミリーアルバム</p>
-        <h1>愛犬の思い出を家族で共有</h1>
-      </div>
-      <nav aria-label="メインナビゲーション">
-        <ul class="site-nav">
-          <li><a href="index.html">ホーム</a></li>
-          <li><a href="album.html">アルバム</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
-
   <main>
-    <section class="hero">
-      <div class="wrap">
-        <h2>写真投稿で犬の気持ちを日記のように残す</h2>
-        <img class="hero-icon" src="assets/images/dog-icon.svg" alt="犬のアイコン" />
-        <p>愛犬の写真を投稿すると自動で犬の気持ちがひと言で表現され、振り返ると日記になるファミリーアルバムです。完全静的サイトなので GitHub Pages と Live Server でそのまま動作します。</p>
-        <a class="button" href="album.html">アルバムを開く</a>
+    <section class="wrap post-section">
+      <form id="postForm" class="post-form">
+        <fieldset>
+          <legend>投稿フォーム</legend>
+          <div class="form-grid">
+            <div>
+              <label for="photoInput">写真を選択</label>
+              <input type="file" id="photoInput" name="photos" accept="image/*" multiple required />
+              <p class="hint">最大5枚まで選択できます。</p>
+            </div>
+
+            <div>
+              <label for="captionInput">コメント（任意）</label>
+              <textarea id="captionInput" name="caption" rows="4" placeholder="今日はどんなことがあった？"></textarea>
+              <p class="hint">コメントなしでも、犬の気持ちが自動で生成されます。</p>
+            </div>
+          </div>
+          <button type="submit">投稿する</button>
+        </fieldset>
+      </form>
+
+      <div id="preview" class="preview hidden" aria-live="polite">
+        <div class="preview-header">
+          <h2>投稿プレビュー</h2>
+          <p id="previewCaption" class="preview-caption"></p>
+        </div>
+        <div id="previewGrid" class="photo-grid"></div>
+        <div class="preview-body">
+          <p id="previewMood" class="preview-mood"></p>
+          <p id="previewStory" class="preview-story"></p>
+        </div>
       </div>
     </section>
 
-    <section class="wrap feature-section" aria-labelledby="features-title">
-      <h2 id="features-title">このサイトでできること</h2>
-      <ul class="feature-list">
-        <li>愛犬の写真を家族で投稿・共有</li>
-        <li>投稿内容から犬の気持ちをひと言で表現</li>
-        <li>写真が並ぶアルバムをいつでも確認</li>
-        <li>ビルドツール不要の静的 HTML/CSS/JavaScript</li>
-      </ul>
+    <section class="wrap album-list">
+      <div id="postList" class="post-list"></div>
     </section>
+  </main>
 
-    <section class="wrap how-it-works" aria-labelledby="how-title">
-      <h2 id="how-title">使い方</h2>
-      <ol>
-        <li>「アルバムを開く」をクリックして投稿ページへ移動</li>
-        <li>写真を選び、コメントを入力して投稿</li>
-        <li>投稿が一覧に追加され、犬の気持ちが記録されます</li>
+  <script src="assets/js/app.js"></script>
       </ol>
     </section>
   </main>
