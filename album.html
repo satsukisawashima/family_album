@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>アルバム - Family Album</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <div>
+        <p class="eyebrow">ファミリーアルバム</p>
+        <h1>アルバム</h1>
+      </div>
+      <nav aria-label="ページナビゲーション">
+        <ul class="site-nav">
+          <li><a href="index.html">ホーム</a></li>
+          <li><a href="album.html" aria-current="page">アルバム</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="wrap album-intro">
+      <h2>写真を投稿して犬の気持ちを記録</h2>
+      <p>愛犬の写真とコメントを投稿すると、犬の気持ちをひと言で表現して一覧表示します。投稿はブラウザの保存機能で保持されます。</p>
+    </section>
+
+    <section class="wrap post-section">
+      <form id="postForm" class="post-form">
+        <fieldset>
+          <legend>投稿フォーム</legend>
+          <div class="form-grid">
+            <label for="photoInput">写真を選択</label>
+            <input type="file" id="photoInput" name="photo" accept="image/*" required />
+
+            <label for="captionInput">コメント</label>
+            <textarea id="captionInput" name="caption" rows="4" placeholder="今日はどんな一日だった？"></textarea>
+          </div>
+          <button type="submit">投稿する</button>
+        </fieldset>
+      </form>
+
+      <div id="preview" class="preview hidden" aria-live="polite">
+        <h2>投稿プレビュー</h2>
+        <figure>
+          <img id="previewImage" alt="投稿画像のプレビュー" />
+          <figcaption id="previewMood"></figcaption>
+        </figure>
+        <p id="previewCaption"></p>
+      </div>
+    </section>
+
+    <section class="wrap album-list" aria-labelledby="album-title">
+      <h2 id="album-title">投稿一覧</h2>
+      <div id="postList" class="post-list"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>すべてのページは単体で表示可能です。HTML/CSS/JavaScriptのみの静的サイトです。</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
