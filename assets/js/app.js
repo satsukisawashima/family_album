@@ -1,43 +1,105 @@
-const STORAGE_KEY = 'familyAlbumPosts';
+const STORAGE_KEY = 'puppyAlbumPosts';
+const MAX_IMAGES = 5;
 const photoInput = document.getElementById('photoInput');
 const captionInput = document.getElementById('captionInput');
 const preview = document.getElementById('preview');
-const previewImage = document.getElementById('previewImage');
+const previewGrid = document.getElementById('previewGrid');
 const previewCaption = document.getElementById('previewCaption');
 const previewMood = document.getElementById('previewMood');
+const previewStory = document.getElementById('previewStory');
 const postList = document.getElementById('postList');
 const postForm = document.getElementById('postForm');
+const editModal = document.getElementById('editModal');
+const editForm = document.getElementById('editForm');
+const editCaption = document.getElementById('editCaption');
+const cancelEdit = document.getElementById('cancelEdit');
+let editingPostId = null;
 
-const moods = [
-  'うれしいな',
-  'わくわくしているよ',
-  'おなかいっぱい',
-  'のんびりしたいな',
-  'おさんぽしたい',
-  'もっと遊びたい',
-  'ひなたぼっこ中',
-  'きもちよくねむい',
-  'だいすきだよ'
-];
+const moodCategories = {
+  happy: 'うれしいな',
+  playful: 'わくわくしているよ',
+  tired: 'きもちよくねむい',
+  curious: 'どきどきしてる',
+  loving: 'だいすきだよ'
+};
 
-function getMood(caption) {
-  const text = caption.trim().toLowerCase();
-  if (text.includes('うれ') || text.includes('たの') || text.includes('にこ')) {
-    return 'うれしいな';
+const storyTemplates = {
+  happy: [
+    '今日はいっぱい走って気持ちがよかったよ！',
+    'おひさまの中でうれしくてにこにこしてたよ。',
+    'おやつももらえて、しあわせいっぱいだったよ。'
+  ],
+  playful: [
+    'あっちもこっちも探索して、わくわくが止まらないよ！',
+    '新しいにおいがたくさんして、とってもたのしかった！',
+    'おさんぽって、やっぱり最高だよね！'
+  ],
+  tired: [
+    'ちょっとねむくなってきたけど、みんながいるから安心だよ。',
+    'たくさん遊んで、もうすこしゆっくりしたいな。',
+    'あったかいところでのんびりしているのが好きだよ。'
+  ],
+  curious: [
+    'ここはどこかな？でもなんだかワクワクする！',
+    'あたらしいものがいっぱいで、いろいろ見てみたいな。',
+    'この場所、においが不思議でたのしいよ。'
+  ],
+  loving: [
+    'ママがそばにいてくれて、とっても安心するよ。',
+    'パパがなでてくれると、もっともっとだいすきになるよ。',
+    'いっしょにいる時間がいちばんしあわせだよ。'
+  ]
+};
+
+function normalizeText(text) {
+  return (text || '').trim().toLowerCase();
+}
+
+function getMoodCategory(caption, fileNames = []) {
+  const text = normalizeText(caption);
+  if (text.match(/さんぽ|散歩|公園|おさんぽ|走る|ラン/)) {
+    return 'playful';
   }
-  if (text.includes('さんぽ') || text.includes('さんぽ')) {
-    return 'おさんぽしたい';
+  if (text.match(/ねむ|おやすみ|すやすや|眠い|お昼寝/)) {
+    return 'tired';
   }
-  if (text.includes('ねむ') || text.includes('おやすみ')) {
-    return 'きもちよくねむい';
+  if (text.match(/たべ|ごはん|おやつ|おいしい|ディナー|ランチ|食べ/)) {
+    return 'happy';
   }
-  if (text.includes('おい') || text.includes('たべ')) {
-    return 'おなかいっぱい';
+  if (text.match(/ママ|パパ|なで|だいすき|いっしょ|愛して/)) {
+    return 'loving';
   }
-  if (text.includes('こわ') || text.includes('いや')) {
-    return 'ちょっとドキドキ';
+  if (text.match(/どこ|わくわく|不思議|はじめて|初めて|きょろきょろ/)) {
+    return 'curious';
   }
-  return moods[Math.floor(Math.random() * moods.length)];
+
+  const fileHint = fileNames.join(' ').toLowerCase();
+  if (fileHint.match(/park|walk|outdoor|play|dog|散歩|公園/)) {
+    return 'playful';
+  }
+  if (fileHint.match(/sleep|nap|bed|ねむ|おやすみ/)) {
+    return 'tired';
+  }
+
+  const categories = Object.keys(moodCategories);
+  return categories[Math.floor(Math.random() * categories.length)];
+}
+
+function getMood(category) {
+  return moodCategories[category] || moodCategories.happy;
+}
+
+function getRandomStory(category) {
+  const list = storyTemplates[category] || storyTemplates.happy;
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function generateStory(caption, category) {
+  const baseStory = getRandomStory(category);
+  if (caption) {
+    return `${caption}  ${baseStory}`;
+  }
+  return baseStory;
 }
 
 function loadPosts() {
@@ -65,58 +127,13 @@ function formatDate(value) {
   });
 }
 
-function renderPosts() {
-  const posts = loadPosts();
-  postList.innerHTML = '';
-
-  if (posts.length === 0) {
-    const empty = document.createElement('div');
-    empty.className = 'no-posts';
-    empty.textContent = 'まだ投稿がありません。写真を選んでコメントといっしょに投稿してください。';
-    postList.appendChild(empty);
-    return;
-  }
-
-  posts.slice().reverse().forEach((post) => {
-    const article = document.createElement('article');
-    article.className = 'post-card';
-    article.innerHTML = `
-      <header>
-        <div class="post-meta">
-          <span>${formatDate(post.createdAt)}</span>
-          <span>犬の気持ち：${post.mood}</span>
-        </div>
-      </header>
-      <img src="${post.image}" alt="投稿された犬の写真" />
-      <div class="post-body">
-        <p class="post-caption">${escapeHtml(post.caption)}</p>
-      </div>
-    `;
-    postList.appendChild(article);
-  });
-}
-
 function escapeHtml(text) {
-  return text
+  return String(text || '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-function showPreview(imageSrc, caption, mood) {
-  previewImage.src = imageSrc;
-  previewCaption.textContent = caption || 'コメントがありません。';
-  previewMood.textContent = `犬の気持ち：${mood}`;
-  preview.classList.remove('hidden');
-}
-
-function hidePreview() {
-  preview.classList.add('hidden');
-  previewImage.src = '';
-  previewCaption.textContent = '';
-  previewMood.textContent = '';
 }
 
 function readFileAsDataURL(file) {
@@ -128,58 +145,122 @@ function readFileAsDataURL(file) {
   });
 }
 
-photoInput.addEventListener('change', async () => {
-  const file = photoInput.files && photoInput.files[0];
-  if (!file) {
+function readFilesAsDataURL(files) {
+  return Promise.all(Array.from(files).map((file) => readFileAsDataURL(file)));
+}
+
+function updatePreview() {
+  const files = Array.from(photoInput.files || []);
+  const caption = captionInput.value.trim();
+  if (files.length === 0) {
     hidePreview();
     return;
   }
 
-  const caption = captionInput.value.trim();
-  const mood = getMood(caption);
-  try {
-    const imageSrc = await readFileAsDataURL(file);
-    showPreview(imageSrc, caption, mood);
-  } catch (error) {
-    console.error('画像の読み込みに失敗しました', error);
+  if (files.length > MAX_IMAGES) {
+    alert(`最大${MAX_IMAGES}枚まで投稿できます。`);
+    photoInput.value = '';
     hidePreview();
+    return;
   }
-});
 
+  readFilesAsDataURL(files).then((images) => {
+    previewGrid.innerHTML = images
+      .map((image) => `<div class="photo-card"><img src="${image}" alt="投稿プレビュー" /></div>`)
+      .join('');
+
+    const category = getMoodCategory(caption, files.map((file) => file.name));
+    previewMood.textContent = `犬の気持ち：${getMood(category)}`;
+    previewStory.textContent = generateStory(caption, category);
+    previewCaption.textContent = caption ? `あなたのコメント: ${caption}` : 'コメントなしでも犬の気持ちが自動生成されます。';
+    preview.classList.remove('hidden');
+  }).catch((error) => {
+    console.error('プレビュー画像の読み込みに失敗しました', error);
+    hidePreview();
+  });
+}
+
+function hidePreview() {
+  preview.classList.add('hidden');
+  previewGrid.innerHTML = '';
+  previewCaption.textContent = '';
+  previewMood.textContent = '';
+  previewStory.textContent = '';
+}
+
+function renderPosts() {
+  const posts = loadPosts();
+  postList.innerHTML = '';
+
+  if (posts.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'no-posts';
+    empty.textContent = 'まだ投稿がありません。まずは写真を選んで投稿してみましょう。';
+    postList.appendChild(empty);
+    return;
+  }
+
+  posts.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach((post) => {
+    const article = document.createElement('article');
+    article.className = 'post-card';
+    article.dataset.id = post.id;
+    article.innerHTML = `
+      <div class="photo-grid">
+        ${post.images.map((src) => `<div class="photo-card"><img src="${src}" alt="投稿された犬の写真" /></div>`).join('')}
+      </div>
+      <div class="post-body">
+        <header>
+          <div class="post-meta">
+            <span>${formatDate(post.createdAt)}</span>
+            <span class="tag">${post.mood}</span>
+          </div>
+        </header>
+        ${post.caption ? `<p class="post-user-comment"><strong>メモ：</strong>${escapeHtml(post.caption)}</p>` : ''}
+        <p class="post-story">${escapeHtml(post.story)}</p>
+        <div class="post-actions">
+          <button type="button" class="edit-btn" data-id="${post.id}">編集</button>
+          <button type="button" class="delete-btn" data-id="${post.id}">削除</button>
+        </div>
+      </div>
+    `;
+    postList.appendChild(article);
+  });
+}
+
+photoInput.addEventListener('change', updatePreview);
 captionInput.addEventListener('input', () => {
-  const file = photoInput.files && photoInput.files[0];
-  if (!file) {
-    return;
+  if (!preview.classList.contains('hidden')) {
+    updatePreview();
   }
-
-  const caption = captionInput.value.trim();
-  const mood = getMood(caption);
-  if (preview.classList.contains('hidden')) {
-    return;
-  }
-  previewMood.textContent = `犬の気持ち：${mood}`;
-  previewCaption.textContent = caption || 'コメントがありません。';
 });
 
 postForm.addEventListener('submit', async (event) => {
   event.preventDefault();
-  const file = photoInput.files && photoInput.files[0];
+  const files = Array.from(photoInput.files || []);
   const caption = captionInput.value.trim();
 
-  if (!file) {
+  if (files.length === 0) {
     alert('写真を選択してください。');
     return;
   }
 
+  if (files.length > MAX_IMAGES) {
+    alert(`最大${MAX_IMAGES}枚まで投稿できます。`);
+    return;
+  }
+
   try {
-    const imageSrc = await readFileAsDataURL(file);
-    const mood = getMood(caption);
+    const images = await readFilesAsDataURL(files);
+    const category = getMoodCategory(caption, files.map((file) => file.name));
+    const mood = getMood(category);
+    const story = generateStory(caption, category);
     const posts = loadPosts();
     posts.push({
       id: Date.now(),
-      image: imageSrc,
+      images,
       caption,
       mood,
+      story,
       createdAt: new Date().toISOString()
     });
     savePosts(posts);
@@ -191,6 +272,92 @@ postForm.addEventListener('submit', async (event) => {
     alert('投稿に失敗しました。もう一度お試しください。');
   }
 });
+
+postList.addEventListener('click', (event) => {
+  const button = event.target.closest('button');
+  if (!button) {
+    return;
+  }
+
+  const postId = button.dataset.id;
+  if (!postId) {
+    return;
+  }
+
+  if (button.classList.contains('edit-btn')) {
+    editPost(postId);
+  }
+
+  if (button.classList.contains('delete-btn')) {
+    deletePost(postId);
+  }
+});
+
+function editPost(id) {
+  const posts = loadPosts();
+  const post = posts.find((item) => String(item.id) === String(id));
+  if (!post) {
+    return;
+  }
+
+  editingPostId = id;
+  editCaption.value = post.caption || post.story;
+  editModal.classList.remove('hidden');
+}
+
+function deletePost(id) {
+  if (!confirm('この投稿を削除しますか？')) {
+    return;
+  }
+
+  const posts = loadPosts();
+  const nextPosts = posts.filter((item) => String(item.id) !== String(id));
+  savePosts(nextPosts);
+  renderPosts();
+}
+
+editForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  if (!editingPostId) {
+    return;
+  }
+
+  const newCaption = editCaption.value.trim();
+  const posts = loadPosts();
+  const index = posts.findIndex((item) => String(item.id) === String(editingPostId));
+  if (index === -1) {
+    return;
+  }
+
+  const category = getMoodCategory(newCaption);
+  posts[index].caption = newCaption;
+  posts[index].mood = getMood(category);
+  posts[index].story = generateStory(newCaption, category);
+  savePosts(posts);
+  closeModal();
+  renderPosts();
+});
+
+cancelEdit.addEventListener('click', () => {
+  closeModal();
+});
+
+editModal.addEventListener('click', (event) => {
+  if (event.target === editModal) {
+    closeModal();
+  }
+});
+
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && !editModal.classList.contains('hidden')) {
+    closeModal();
+  }
+});
+
+function closeModal() {
+  editingPostId = null;
+  editModal.classList.add('hidden');
+}
 
 window.addEventListener('DOMContentLoaded', () => {
   renderPosts();

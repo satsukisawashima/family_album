@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>アルバム - Family Album</title>
+  <title>アルバム - パピーアルバム</title>
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
   <header class="site-header">
     <div class="wrap header-inner">
       <div>
-        <p class="eyebrow">ファミリーアルバム</p>
-        <h1>アルバム</h1>
+        <p class="eyebrow">パピーアルバム</p>
+        <h1>写真を投稿すると、犬の気持ちが自動で生まれる</h1>
       </div>
       <nav aria-label="ページナビゲーション">
         <ul class="site-nav">
@@ -23,9 +23,12 @@
   </header>
 
   <main>
-    <section class="wrap album-intro">
-      <h2>写真を投稿して犬の気持ちを記録</h2>
-      <p>愛犬の写真とコメントを投稿すると、犬の気持ちをひと言で表現して一覧表示します。投稿はブラウザの保存機能で保持されます。</p>
+    <section class="wrap album-hero">
+      <div class="hero-copy">
+        <p class="eyebrow">写真投稿を日記体験に</p>
+        <h2>写真をアップするだけで、愛犬の気持ちとストーリーが自動生成されます</h2>
+        <p>複数枚投稿にも対応し、投稿はタイムラインで最新順に表示されます。写真は横に最大3枚並び、あとは縦に続く「みてね」風のレイアウトです。</p>
+      </div>
     </section>
 
     <section class="wrap post-section">
@@ -33,35 +36,63 @@
         <fieldset>
           <legend>投稿フォーム</legend>
           <div class="form-grid">
-            <label for="photoInput">写真を選択</label>
-            <input type="file" id="photoInput" name="photo" accept="image/*" required />
+            <div>
+              <label for="photoInput">写真を選択</label>
+              <input type="file" id="photoInput" name="photos" accept="image/*" multiple required />
+              <p class="hint">最大5枚まで選択できます。</p>
+            </div>
 
-            <label for="captionInput">コメント</label>
-            <textarea id="captionInput" name="caption" rows="4" placeholder="今日はどんな一日だった？"></textarea>
+            <div>
+              <label for="captionInput">コメント（任意）</label>
+              <textarea id="captionInput" name="caption" rows="4" placeholder="今日はどんなことがあった？"></textarea>
+              <p class="hint">コメントなしでも、犬の気持ちが自動で生成されます。</p>
+            </div>
           </div>
           <button type="submit">投稿する</button>
         </fieldset>
       </form>
 
       <div id="preview" class="preview hidden" aria-live="polite">
-        <h2>投稿プレビュー</h2>
-        <figure>
-          <img id="previewImage" alt="投稿画像のプレビュー" />
-          <figcaption id="previewMood"></figcaption>
-        </figure>
-        <p id="previewCaption"></p>
+        <div class="preview-header">
+          <h2>投稿プレビュー</h2>
+          <p id="previewCaption" class="preview-caption"></p>
+        </div>
+        <div id="previewGrid" class="photo-grid"></div>
+        <div class="preview-body">
+          <p id="previewMood" class="preview-mood"></p>
+          <p id="previewStory" class="preview-story"></p>
+        </div>
       </div>
     </section>
 
     <section class="wrap album-list" aria-labelledby="album-title">
-      <h2 id="album-title">投稿一覧</h2>
+      <div class="section-head">
+        <div>
+          <h2 id="album-title">投稿タイムライン</h2>
+          <p>写真は最新順に並びます。横に最大3枚表示され、以降は縦に並ぶレイアウトです。</p>
+        </div>
+      </div>
       <div id="postList" class="post-list"></div>
     </section>
   </main>
 
+  <div id="editModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+    <div class="modal-content">
+      <h3 id="editModalTitle">コメントを編集</h3>
+      <form id="editForm">
+        <label for="editCaption">コメント</label>
+        <textarea id="editCaption" rows="4"></textarea>
+        <div class="modal-actions">
+          <button type="button" id="cancelEdit">キャンセル</button>
+          <button type="submit">保存する</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <footer class="site-footer">
     <div class="wrap">
-      <p>すべてのページは単体で表示可能です。HTML/CSS/JavaScriptのみの静的サイトです。</p>
+      <p>HTML/CSS/JavaScriptのみの静的サイトです。GitHub PagesやLive Serverでそのまま確認できます。</p>
     </div>
   </footer>
 
